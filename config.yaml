@@ -1,0 +1,58 @@
+system:
+  name: "LogPulse Lightweight Distributed Log Anomaly Detection"
+  seed: 42
+  host: "0.0.0.0"
+  port: 5000
+
+parser:
+  depth: 4
+  max_children: 100
+  sim_threshold: 0.5
+  max_templates: 1000
+
+windowing:
+  adaptive:
+    base_interval_s: 60
+    history_k: 30
+    burst_ratio: 2.0
+    rising_ratio: 1.3
+    cooldown: 2
+    min_logs: 5
+    short_window_s: 60
+    medium_window_s: 300
+    long_window_s: 600
+  fixed_windows_min: [1, 5, 10, 100]
+
+features:
+  rare_template_percentile: 15
+  entropy_base: 2.0
+
+detector:
+  n_estimators: 200
+  max_samples: "auto"
+  contamination: "auto"
+  random_state: 42
+
+aggregator:
+  n_partitions: 4
+  local_weight: 0.6
+  global_weight: 0.4
+
+severity_bands:
+  normal: [0.00, 0.30]
+  low: [0.30, 0.50]
+  medium: [0.50, 0.70]
+  high: [0.70, 0.90]
+  critical: [0.90, 1.00]
+
+explanation:
+  z_score_threshold: 2.5
+  max_top_features: 3
+
+incremental:
+  update_every: 50
+  buffer_size: 2000
+  allowed_severities: ["Normal", "Low"]
+
+storage:
+  db_path: "results/logpulse.db"
